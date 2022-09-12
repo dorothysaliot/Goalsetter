@@ -7,7 +7,8 @@ const Goal = require('../models/goalModel');
 //@route GET /api/goals
 //@access PRIVATE
 const getGoals = asyncHandler( async (req,res) =>{
-    const goals = await Goal.find();
+    //get the specifi goal from a particular user_id
+    const goals = await Goal.find({user:req.user.id});
     res.send(goals)
 })
 
@@ -20,7 +21,8 @@ const setGoals = asyncHandler (async (req,res) =>{
         throw new Error('Please add text field')
     }
     const goal = await Goal.create({
-        text:req.body.text
+        text:req.body.text,
+        user:req.user.id
     })
     res.send(goal)
 })
