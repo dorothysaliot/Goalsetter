@@ -28,7 +28,8 @@ const registerUser  = asyncHandler(async(req,res) =>{
     const user = await User.create({
         name,
         email,
-        password:hashedPassword
+        password:hashedPassword,
+        
     })
 
     //validate if the user was created
@@ -36,7 +37,8 @@ const registerUser  = asyncHandler(async(req,res) =>{
         res.status(200).json({
             _id:user.id,
             name:user.name,
-            email:user.email
+            email:user.email,
+            token:generateWebToken(user._id)
         })
     }else{
         res.status(400)
@@ -56,23 +58,33 @@ const loginUser  = asyncHandler(async(req,res) =>{
         res.status(200).json({
             _id:user.id,
             name:user.name,
-            email:user.email
+            email:user.email,
+            token:generateWebToken(user._id)
         })
     }else{
         res.status(400)
         throw new Error('Invalid credentials');
     }
 
-    res.send({message:'Login User'});
+    
 })
 
 //@desc GET user data
 //@route GET /api/users/me
-//@access PUBLIC
+//@access PRIVATE
 const getMe  = asyncHandler(async(req,res) =>{
-    res.send({message:'User data display'});
+    const {_id,name,email} = User.findById(req.user.id)
+    res.status(200).json({
+        id:_id,
+        name,
+        email
+    })
 })
 
+//generate web token function
+const generateWebToken = (id) =>{
+    return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn:'30d'})
+}
 
 
 module.exports = {
