@@ -1,7 +1,8 @@
 const asyncHandler = require('express-async-handler');
 
-//model here
+//models here
 const Goal = require('../models/goalModel');
+const User = require('../models/userModel');
 
 //@desc GET goals
 //@route GET /api/goals
@@ -30,29 +31,60 @@ const setGoals = asyncHandler (async (req,res) =>{
 //@desc UPDATE goals
 //@route PUT /api/goals/:id
 //@access PRIVATE
-const updateGoals = asyncHandler(async (req,res) =>{
-    const goal = await Goal.findById(req.params.id);
-    if(!goal){
-        res.status(400)
-        throw new Error('Goal not found')
+const updateGoals = asyncHandler(async (req, res) => {
+    const goal = await Goal.findById(req.params.id)
+  
+    if (!goal) {
+      res.status(400)
+      throw new Error('Goal not found')
     }
-    const updatedGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {new:true})
-
-    res.send(updatedGoal)
-})
+  
+    // Check for user
+    if (!req.user) {
+        res.status(401)
+        throw new Error('User not found')
+      }
+    
+      // Make sure the logged in user matches the goal user
+      if (goal.user.toString() !== req.user.id) {
+        res.status(401)
+        throw new Error('User not authorized')
+      }
+  
+    const updatedGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    })
+  
+    res.status(200).json(updatedGoal)
+  })
 
 //@desc DELETE goals
 //@route DELETE /api/goals/:id
 //@access PRIVATE
-const deleteGoals = asyncHandler(async (req,res) =>{
-    const goal = await Goal.findById(req.params.id);
-    if(!goal){
-        res.status(400)
-        throw new Error('Goal not found')
+const deleteGoals = asyncHandler(async (req, res) => {
+    const goal = await Goal.findById(req.params.id)
+  
+    if (!goal) {
+      res.status(400)
+      throw new Error('Goal not found')
     }
+  
+    // Check for user
+    if (!req.user) {
+      res.status(401)
+      throw new Error('User not found')
+    }
+  
+    // Make sure the logged in user matches the goal user
+    if (goal.user.toString() !== req.user.id) {
+      res.status(401)
+      throw new Error('User not authorized')
+    }
+  
     await goal.remove()
-    res.send({id:req.params.id})
-})
+  
+    res.status(200).json({ id: req.params.id })
+  })
 
 module.exports = {
     getGoals,
