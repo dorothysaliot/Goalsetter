@@ -1,2 +1,4 @@
-# Run server
-npm run server
+
+npm run server 
+<br>
+npm run client
