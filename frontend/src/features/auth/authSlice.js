@@ -30,6 +30,13 @@ export const register = createAsyncThunk('auth/register' , async(user,thunkAPI) 
 } )
 
 
+//logout user
+
+export const logout = createAsyncThunk('auth/logout', async () => {
+    await authService.logout()
+  })
+
+
 // naglibog ko diri na part :<<
 // actual slice
 export const authSlice =createSlice({
@@ -57,6 +64,9 @@ export const authSlice =createSlice({
             state.isLoading = false
             state.isError = true
             state.message = action.payload
+            state.user = null
+        })
+        .addCase(logout.fulfilled,(state) =>{
             state.user = null
         })
     }
