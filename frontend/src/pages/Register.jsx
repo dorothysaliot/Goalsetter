@@ -75,7 +75,7 @@ function Register() {
 
   return (
     <>
-    <section className='header'>
+    <section className='heading'>
         <h1>
             <FaUser/> Register
         </h1>
